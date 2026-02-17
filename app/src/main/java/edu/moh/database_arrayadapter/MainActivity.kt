@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.item.view.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         var member=editTextTextPersonName.text.toString()
         var nameb=editTextTextPersonName2.text.toString()
         var date=editTextTextPersonName3.text.toString()
-        my.addProduct(member,nameb,date)
+        my.addProduct(BookModel(member,nameb,date.toInt(),null))
         if (member.isEmpty() || nameb.isEmpty() || date.isEmpty()) {
             Toast.makeText(this, "من فضلك ادخل جميع القيم", Toast.LENGTH_SHORT).show()
             return
@@ -38,16 +37,5 @@ class MainActivity : AppCompatActivity() {
         editTextTextPersonName.text.clear()
     }
 
-    fun delete(view: View) {
-        var nameproduct = editTextTextPersonName2.text.toString()
 
-        if (nameproduct.isEmpty()) {
-            Toast.makeText(this, "الرجاء ادخال اسم المنتج", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-
-        my.deleteProduct(nameproduct)
-
-    }
 }

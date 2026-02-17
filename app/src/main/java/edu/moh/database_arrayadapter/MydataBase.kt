@@ -3,13 +3,12 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import edu.moh.database_arrayadapter.BookModel
 
 class MydataBase(context: Context):SQLiteOpenHelper(context, DATABASE_NAME,null, DATABASE_VERSION) {
-
     override fun onCreate(p0: SQLiteDatabase?) {
         p0!!.execSQL(DATABASE_CREATE)
     }
-
     override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
         p0!!.execSQL("DROP TABLE IF EXISTS $DATABASE_TABLE_NAME")
         onCreate(p0)
@@ -20,67 +19,64 @@ class MydataBase(context: Context):SQLiteOpenHelper(context, DATABASE_NAME,null,
         private val BOOKNAME="bookname"
         private val DATE="date"
         private val DATABASE_TABLE_NAME="book"
-
-
         private val DATABASE_VERSION=1
         private val DATABASE_NAME="name"
         private val DATABASE_CREATE=
             "CREATE TABLE $DATABASE_TABLE_NAME ($KEY_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "$BOOKNAME TEXT NOT NULL, " + "$MEMBERNAME TEXT NOT NULL, " + "$DATE TEXT NOT NULL);"
     }
-    fun addProduct(member: String, bookname: String, date: String) {
+    fun addProduct(p:BookModel) {
         val db=this.writableDatabase
         val values=ContentValues()
-        values.put(MEMBERNAME, member)
-        values.put(BOOKNAME, bookname)
-        values.put(DATE, date)
+        values.put(MEMBERNAME,p.nameM)
+        values.put(BOOKNAME, p.nameB)
+        values.put(DATE, p.date)
+        values.put(KEY_ID,p.id)
         db.insert(DATABASE_TABLE_NAME, null, values)
         db.close()
     }
-    fun deleteProduct(name: String) {
+    fun deleteProduct(p:Int) {
         val db=writableDatabase
-        db.execSQL("delete from $DATABASE_TABLE_NAME where $BOOKNAME=\"${name}\";")
+        db.execSQL("delete from $DATABASE_TABLE_NAME where $BOOKNAME=\"${p}\";")
     }
     @SuppressLint("Range", "SuspiciousIndentation")
-    fun show(): Array<Array<String>> {
+    fun show(): MutableList<BookModel> {
+        var dbString:ArrayList<BookModel>
         val db=writableDatabase
-        val query="SELECT * FROM $DATABASE_TABLE_NAME WHERE 1"
+        val query="SELECT * FROM $DATABASE_TABLE_NAME"
         val c=db.rawQuery(query, null)
-        var dbString=Array(c.count) { Array(4) { "" } }
-        var i=0
-        if (c.moveToFirst()) {
-            while (!c.isAfterLast) {
-                dbString[i][0]=c.getString(c.getColumnIndex(MEMBERNAME))
-                dbString[i][1]=c.getString(c.getColumnIndex(BOOKNAME))
-                dbString[i][2]=c.getString(c.getColumnIndex(DATE))
-                dbString[i][3]=c.getString(c.getColumnIndex(KEY_ID))
-                i++
-                c.moveToNext()
+         dbString=ArrayList(c.count)
+            if (c.moveToFirst()) {
+                do {
+                    var member=c.getString(c.getColumnIndex(MEMBERNAME))
+                    var book=c.getString(c.getColumnIndex(BOOKNAME))
+                    var date=c.getInt(c.getColumnIndex(DATE))
+                    var id2=c.getInt(c.getColumnIndex(KEY_ID))
+                    var b=BookModel(member,book,date,id2)
+                    dbString.add(b)
+                }
+                while (c.moveToNext())
             }
-        }
-        c.close()
         return dbString
-    }
-    @SuppressLint("Range")
-    fun find(name: String): Array<Array<String>> {
-        val db=writableDatabase
-        val query="select * from $DATABASE_TABLE_NAME where $BOOKNAME=\"${name}\";"
-        val c=db.rawQuery(query, null)
-        var dbString=Array(c.count) { Array(4) { "" } }
-        var i=0
-        if (c.moveToFirst()) {
-
-            while (!c.isAfterLast) {
-                dbString[i][0]=c.getString(c.getColumnIndex(MEMBERNAME))
-                dbString[i][1]=c.getString(c.getColumnIndex(BOOKNAME))
-                dbString[i][2]=c.getString(c.getColumnIndex(DATE))
-                dbString[i][3]=c.getString(c.getColumnIndex(KEY_ID))
-
-                i++
-                c.moveToNext()
-            }
         }
-        c.close()
+    @SuppressLint("Range", "SuspiciousIndentation")
+    fun find(P:BookModel): MutableList<BookModel> {
+        var dbString:ArrayList<BookModel>
+        val db=writableDatabase
+        val query="select * from $DATABASE_TABLE_NAME where $BOOKNAME=\"${P.nameB}\";"
+        val c=db.rawQuery(query, null)
+        dbString=ArrayList(c.count)
+        if (c.moveToFirst()) {
+            do {
+                var MEMBERNAME=c.getString(c.getColumnIndex(MEMBERNAME))
+                var BOOKNAME=c.getString(c.getColumnIndex(BOOKNAME))
+               var DATE=c.getInt(c.getColumnIndex(DATE))
+               var KEY_ID=c.getInt(c.getColumnIndex(KEY_ID))
+                var book=BookModel(MEMBERNAME,BOOKNAME,DATE,KEY_ID)
+                    dbString.add(book)
+            }
+        while (c.moveToNext())
+        }
         return dbString
     }
 }

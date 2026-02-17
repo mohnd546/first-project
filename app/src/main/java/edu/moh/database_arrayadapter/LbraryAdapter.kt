@@ -1,23 +1,33 @@
 package edu.moh.database_arrayadapter
 
+import MydataBase
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.item.view.*
-
-class LbraryAdapter(context: Context, private val objects: Array<Array< String>>) :
-    ArrayAdapter<Array<String>>(context, R.layout.item, objects) {
+class LibraryAdapter(context: Context,private val objects: MutableList<BookModel>)
+    : ArrayAdapter<BookModel>(context,R.layout.item,objects) {
+lateinit var mud:MydataBase
+lateinit var bookm:BookModel
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val l=LayoutInflater.from(context)
-        val view=l.inflate(R.layout.item,parent,false)
+        val view=convertView ?: LayoutInflater.from(context).inflate(R.layout.item, parent, false)
+            val d:BookModel=getItem(position)!!
 
-        view.textView.text="Member Name: " + objects[position][0]
-        view.textView2.text="Book Name: " + objects[position][1]
-        view.textView3.text="Date: " + objects[position][2]
-        view.textView4.text="ID: " + objects[position][3]
+        view.textView.text="Member Name: " + objects[position]
+        view.textView2.text="Book Name: " + objects[position]
+        view.textView3.text="Date: " + objects[position]
+        view.textView4.text="ID: " + objects[position]
 
-        return  view
+
+
+        view.imageButton.setOnClickListener {
+            mud.deleteProduct(d.id!!)
+            objects.removeAt(position)
+            notifyDataSetChanged()
+        }
+
+        return view
     }
 }
