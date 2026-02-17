@@ -23,7 +23,7 @@ class MydataBase(context: Context):SQLiteOpenHelper(context, DATABASE_NAME,null,
         private val DATABASE_NAME="name"
         private val DATABASE_CREATE=
             "CREATE TABLE $DATABASE_TABLE_NAME ($KEY_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "$BOOKNAME TEXT NOT NULL, " + "$MEMBERNAME TEXT NOT NULL, " + "$DATE TEXT NOT NULL);"
+                    "$BOOKNAME TEXT NOT NULL, " + "$MEMBERNAME TEXT NOT NULL, " + "$DATE INTEGER);"
     }
     fun addProduct(p:BookModel) {
         val db=this.writableDatabase
@@ -31,13 +31,12 @@ class MydataBase(context: Context):SQLiteOpenHelper(context, DATABASE_NAME,null,
         values.put(MEMBERNAME,p.nameM)
         values.put(BOOKNAME, p.nameB)
         values.put(DATE, p.date)
-        values.put(KEY_ID,p.id)
         db.insert(DATABASE_TABLE_NAME, null, values)
         db.close()
     }
-    fun deleteProduct(p:Int) {
+    fun deleteProduct(p: Int) {
         val db=writableDatabase
-        db.execSQL("delete from $DATABASE_TABLE_NAME where $BOOKNAME=\"${p}\";")
+        db.execSQL("delete from $DATABASE_TABLE_NAME where $KEY_ID=\"${p}\";")
     }
     @SuppressLint("Range", "SuspiciousIndentation")
     fun show(): MutableList<BookModel> {
